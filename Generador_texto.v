@@ -24,8 +24,6 @@ module Generador_texto(
 
 ////////// INPUTS //////////
    input wire clk,
-   //input clk_parp,
-   //input wire video_on,
    input wire [8:0] sig_band_cursor,
    input wire [9:0] pixel_x, pixel_y,   
    // entradas de los digitos de 8 bits
@@ -42,7 +40,6 @@ module Generador_texto(
    reg [3:0] row_addr;
    reg [2:0] bit_addr;
    wire [7:0] font_word;
-   //wire [2:0] rgb_graph;
    wire font_bit;
    
    
@@ -50,12 +47,6 @@ module Generador_texto(
    // instantiate font ROM
    Font_rom font_unit
       (.clk(clk), .addr(rom_addr), .data(font_word));
-      
-//   // paquetes de diseño
-//     wire borde_up, borde_down;
-//     reg [6:0] char_addr_borde_up, char_addr_borde_down;
-//     wire [3:0] row_addr_borde_up, row_addr_borde_down;
-//     wire [2:0] bit_addr_borde_up, bit_addr_borde_down;
     
 // character  
     reg [6:0] char_addr_FECHA, char_addr_NumFECHA, char_addr_HORA, char_addr_NumHORA, char_addr_ForMili, char_addr_CRONO, char_addr_NumCRONO, char_addr_RING, char_addr_SIMBOLO;
@@ -75,35 +66,26 @@ module Generador_texto(
     //Asignaciones 
       
 ////////// RELOJ ////////////
-    assign din_rh_dig02 = din_rh[7:4];
-    assign din_rh_dig01 = din_rh[3:0];
-    assign din_rm_dig02 = din_rm[7:4];
-    assign din_rm_dig01 = din_rm[3:0];
-    assign din_rs_dig02 = din_rs[7:4];
-    assign din_rs_dig01 = din_rs[3:0];
+    assign din_rh_dig02 = din_rh[7:4]; assign din_rh_dig01 = din_rh[3:0];
+    assign din_rm_dig02 = din_rm[7:4]; assign din_rm_dig01 = din_rm[3:0];
+    assign din_rs_dig02 = din_rs[7:4]; assign din_rs_dig01 = din_rs[3:0];
 
 ////////// CRONO ////////////
-    assign din_ch_dig02 = din_ch[7:4];
-    assign din_ch_dig01 = din_ch[3:0];
-    assign din_cm_dig02 = din_cm[7:4];
-    assign din_cm_dig01 = din_cm[3:0];
-    assign din_cs_dig02 = din_cs[7:4];
-    assign din_cs_dig01 = din_cs[3:0]; 
+    assign din_ch_dig02 = din_ch[7:4]; assign din_ch_dig01 = din_ch[3:0];
+    assign din_cm_dig02 = din_cm[7:4]; assign din_cm_dig01 = din_cm[3:0];
+    assign din_cs_dig02 = din_cs[7:4]; assign din_cs_dig01 = din_cs[3:0]; 
 
 ////////// Fecha ////////////
-    assign din_year_dig02 = din_year[7:4];
-    assign din_year_dig01 = din_year[3:0];
-    assign din_mes_dig02  = din_mes[7:4];
-    assign din_mes_dig01  = din_mes[3:0];
-    assign din_dia_dig02  = din_dia[7:4];
-    assign din_dia_dig01  = din_dia[3:0];  
+    assign din_year_dig02 = din_year[7:4]; assign din_year_dig01 = din_year[3:0];
+    assign din_mes_dig02  = din_mes[7:4];  assign din_mes_dig01  = din_mes[3:0];
+    assign din_dia_dig02  = din_dia[7:4];  assign din_dia_dig01  = din_dia[3:0];  
 
-
+//// Se comienzan a crear las palabras y dígitos ////
 
 ///// PALABRA FECHA /////
-    assign FECHA_on = ((pixel_y[9:5]==1) && (pixel_x[9:4]>=18) && (pixel_x[9:4]<=22)); //Me difine el tamaño y=2^5 y x=2^5
-	assign row_addr_FECHA = pixel_y[4:1]; //me define el tamaño de la letra
-	assign bit_addr_FECHA = pixel_x[3:1]; //me define el tamaño de la letra	
+    assign FECHA_on = ((pixel_y[9:5]==1) && (pixel_x[9:4]>=18) && (pixel_x[9:4]<=22)); // se coloca en pixel_y =1 y se establecen los limites en pixel_x
+	assign row_addr_FECHA = pixel_y[4:1]; //tamaño de la letra
+	assign bit_addr_FECHA = pixel_x[3:1]; //tamaño de la letra	
 		
 	always @*
       case(pixel_x[6:4])
@@ -113,12 +95,12 @@ module Generador_texto(
 		 4'h5: char_addr_FECHA = 7'h48; // H
 		 4'h6: char_addr_FECHA = 7'h41; // A
 					
-         default: char_addr_FECHA = 7'h20; //espacio en blanco
+         default: char_addr_FECHA = 7'h20; 
       endcase
       
      
 ///// DIGITOS DE FECHA ////
-    assign NumFECHA_on = (pixel_y[9:5]<=3) && (pixel_y[9:5]>=2) && (pixel_x[9:6]>=3) && (pixel_x[9:6]<=6); //coordenadas donde se pintara los digitos
+    assign NumFECHA_on = (pixel_y[9:5]<=3) && (pixel_y[9:5]>=2) && (pixel_x[9:6]>=3) && (pixel_x[9:6]<=6); 
     assign row_addr_NumFECHA = pixel_y[5:2]; //tamaño de la letra 
     assign bit_addr_NumFECHA = pixel_x[4:2]; //tamaño de la letra
       
@@ -141,19 +123,18 @@ module Generador_texto(
     
     
 ////// Palabra HORA ////
-      assign HORA_on = ((pixel_y[9:5]==5) && (pixel_x[9:4]>=18) && (pixel_x[9:4]<=21)); //Me difine el tamaño y=2^5 y x=2^5
-      assign row_addr_HORA = pixel_y[4:1]; //pix_y[5:1] //me define el tamaño de la letra
-      assign bit_addr_HORA = pixel_x[3:1]; //pix_x[4:1]//me define el tamaño de la letra
+      assign HORA_on = ((pixel_y[9:5]==5) && (pixel_x[9:4]>=18) && (pixel_x[9:4]<=21)); // se coloca en pixel_y =5 y se establecen los limites en pixel_x
+      assign row_addr_HORA = pixel_y[4:1]; //tamaño de la letra
+      assign bit_addr_HORA = pixel_x[3:1]; //tamaño de la letra
       
       always @* 
       begin
-          case(pixel_x[5:4]) //para este caso cada 2^4 bits se pinta nueva letra
-                                //coordenadas definidas dependiendo de las coordenadas especificadas anteriormente en HORA_on
+          case(pixel_x[5:4]) 
               2'h2: char_addr_HORA = 7'h48; //H
               2'h3: char_addr_HORA = 7'h4f; //O
               2'h0: char_addr_HORA = 7'h52; //R
               2'h1: char_addr_HORA = 7'h41; //A
-              default: char_addr_HORA = 7'h00;//Espacio en blanco
+              default: char_addr_HORA = 7'h00;
               
           endcase
       end
@@ -175,19 +156,18 @@ module Generador_texto(
                    3'h4: char_addr_NumHORA = {3'b011, din_rs_dig02}; // 0               
                    3'h5: char_addr_NumHORA = {3'b011, din_rs_dig01}; // 0  
           
-           default: char_addr_NumHORA = 7'h00;//Espacio en blanco
+           default: char_addr_NumHORA = 7'h00;
        endcase    
    end
    
-   ////// Palabra CRONOMETRO////
-         assign CRONO_on = ((pixel_y[9:5]==9) && (pixel_x[9:4]>=18) && (pixel_x[9:4]<=22)); //Me difine el tamaño y=2^5 y x=2^5
-         assign row_addr_CRONO = pixel_y[4:1]; //pix_y[5:1] //me define el tamaño de la letra
-         assign bit_addr_CRONO = pixel_x[3:1]; //pix_x[4:1]//me define el tamaño de la letra
+   ////// Palabra Timer////
+         assign CRONO_on = ((pixel_y[9:5]==9) && (pixel_x[9:4]>=18) && (pixel_x[9:4]<=22)); // se coloca en pixel_y =9 y se establecen los limites en pixel_x
+         assign row_addr_CRONO = pixel_y[4:1]; //tamaño de la letra
+         assign bit_addr_CRONO = pixel_x[3:1]; // tamaño de la letra
          
          always @* 
          begin
-             case(pixel_x[6:4]) //para este caso cada 2^4 bits se pinta nueva letra
-                                   //coordenadas definidas dependiendo de las coordenadas especificadas anteriormente en HORA_on
+             case(pixel_x[6:4]) 
                  4'h2: char_addr_CRONO = 7'h54; // T.
                  4'h3: char_addr_CRONO = 7'h49; // I.
                  4'h4: char_addr_CRONO = 7'h4d; // M.                          
@@ -199,14 +179,14 @@ module Generador_texto(
              endcase
          end
          
-   ////// Digitos cronometro ///
+   ////// Digitos Timer ///
        assign NumCRONO_on = (pixel_y[9:5]<=11) && (pixel_y[9:5]>=10) && (pixel_x[9:6]>=3) && (pixel_x[9:6]<=6); //coordenadas donde se pintara los digitos
        assign row_addr_NumCRONO= pixel_y[5:2]; //tamaño de la letra 
        assign bit_addr_NumCRONO = pixel_x[4:2]; //tamaño de la letra
       
     always@*
       begin
-          case(pixel_x[7:5]) //coordenadas definidas dependiendo de las coordenadas especificadas anteriormente en NumHORA_on
+          case(pixel_x[7:5]) 
                       3'h6: char_addr_NumCRONO = {3'b011, din_ch_dig02};
                       3'h7: char_addr_NumCRONO = {3'b011, din_ch_dig01};
                       3'h0: char_addr_NumCRONO = 7'h2f; // /
@@ -237,21 +217,10 @@ module Generador_texto(
           
       end
       
- ///////// grafos de diseño/////////////
-            
-//           assign On_borde_down =(pixel_y[9:5]==13)  && (pixel_x[9:6]>=2) && (pixel_x[9:6]<=30); 
-//           assign row_addr_borde_down=pixel_x[3:1]; 
-//           assign bit_addr_borde_down=pixel_y[4:1];
-//           always @*
-//           begin
-//              char_addr_borde_down = 7'h1e;        //?
-//           end
-
-
-
     assign rom_addr = {char_addr, row_addr};
     assign font_bit = font_word[~bit_addr];
 
+//// lógica para poder mostrar grafos es pantalla
 
 always @(posedge clk) begin
 		
@@ -274,7 +243,7 @@ always @(posedge clk) begin
         row_addr = row_addr_NumFECHA;
         bit_addr = bit_addr_NumFECHA;
             if (font_bit) begin
-                rgb_text = 12'h0C0; //blanco
+                rgb_text = 12'h0C0; //naranja
             end
                       else 
                            if ((~font_bit)&&(pixel_y[9:5]<=3) && (pixel_y[9:5]>=2)&&(pixel_x[9:5]>=6)&&(pixel_x[9:5]<8)&&(sig_band_cursor[8]==1)) //HORA QUITE UN = EN SEGUNDO X
@@ -306,7 +275,7 @@ always @(posedge clk) begin
                 row_addr = row_addr_NumHORA;
                 bit_addr = bit_addr_NumHORA;
                     if (font_bit) begin
-                        rgb_text = 12'h0C0; //blanco
+                        rgb_text = 12'h0C0; //naranja
                     end
                      else 
                           if ((~font_bit)&&(pixel_y[9:5]<=7) && (pixel_y[9:5]>=6)&&(pixel_x[9:5]>=6)&&(pixel_x[9:5]<8)&&(sig_band_cursor[5]==1)) //se posiciona en HORA 
@@ -340,7 +309,7 @@ always @(posedge clk) begin
                   row_addr = row_addr_NumCRONO;
                   bit_addr = bit_addr_NumCRONO;
                       if (font_bit) begin
-                          rgb_text = 12'h0C0; //blanco
+                          rgb_text = 12'h0C0; //naranja
                       end
                        else 
                             if ((~font_bit)&&(pixel_y[9:5]<=11) && (pixel_y[9:5]>=10)&&(pixel_x[9:5]>=6)&&(pixel_x[9:5]<8)&&(sig_band_cursor[2]==1)) //HORA QUITE UN = EN SEGUNDO X
@@ -364,20 +333,6 @@ always @(posedge clk) begin
                          rgb_text = 12'hF11; //Rojo
                          end
                     end
-        //////////////////////////////////////////////////////////////////  
-//         else if(On_borde_down) //Diseño borde de abajo
-//                         begin
-//                         char_addr = char_addr_borde_down;
-//                         row_addr = row_addr_borde_down;
-//                         bit_addr = bit_addr_borde_down;
-//                             if (font_bit) begin
-//                                 rgb_text = 12'h0C0; //blanco
-//                             end
-                                          
-//                          end
-               ////////////////////////////////////////////////////////////////// 
-        
-        
         
         else begin
             rgb_text = 12'h000; //negro
