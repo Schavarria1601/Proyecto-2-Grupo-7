@@ -4,7 +4,7 @@
 // Engineer: 
 // 
 // Create Date: 24.04.2017 10:14:49
-// Design Name: 
+// Design Name: Daniela Solis
 // Module Name: RBG_MUX
 // Project Name: 
 // Target Devices: 
