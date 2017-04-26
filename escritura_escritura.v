@@ -21,7 +21,7 @@
 module escritura_escritura(
     clk, reset,
     inicio,
-    salida_contador,
+    //salida_contador,
     AD_reg, CS_reg, WR_reg, RD_reg, Data_reg, 
     end_flag
     );
@@ -32,7 +32,7 @@ module escritura_escritura(
     output reg end_flag;
     parameter largo = 9;
     parameter bus = 4;
-    output wire [largo-1:0] salida_contador;
+    //output wire [largo-1:0] salida_contador;
     
     //  Declaración de estados
     parameter [bus-1:0]   a = 4'b0000,
@@ -66,7 +66,7 @@ module escritura_escritura(
     //  Lógica secuencial del siguiente estado
     always @(posedge clk, posedge reset)
         if (reset)
-            state_reg <= a;
+            state_reg <= b;
         else
             state_reg <= state_next;          
             
@@ -101,7 +101,7 @@ module escritura_escritura(
                 end
                                         
             c : begin
-                CS = 1'b1; AD = 1'b0; RD = 1'b1; WR = 1'b1; Data = 1'b0; end_flag = 1'b0;
+                AD = 1'b0; RD = 1'b1; WR = 1'b1; Data = 1'b0; end_flag = 1'b0;
                 if (contador == 20) begin
                     state_next = d;
                     CS = 0; end  
@@ -110,7 +110,7 @@ module escritura_escritura(
                 end
                         
             d : begin
-                CS = 1'b0; AD = 1'b0; RD = 1'b1; WR = 1'b1; Data = 1'b0; end_flag = 1'b0;
+                CS = 0; AD = 1'b0; RD = 1'b1; WR = 1'b1; Data = 1'b0; end_flag = 1'b0;
                 if (contador == 30) begin
                     state_next = e;
                     WR = 0; end                                                
@@ -224,5 +224,5 @@ module escritura_escritura(
     assign WR_reg = WR;
     assign AD_reg = AD;
     assign Data_reg = Data;
-    assign salida_contador = contador;
+    //assign salida_contador = contador;
 endmodule
