@@ -22,8 +22,8 @@ module escritura_lectura(
     clk, reset,
     inicio,
     AD_reg, CS_reg, WR_reg, RD_reg, Data_reg, 
-    end_flag,
-    salida_contador
+    end_flag
+    //salida_contador
     );
     
     input wire clk, reset;
@@ -32,7 +32,7 @@ module escritura_lectura(
     output reg end_flag;
     parameter largo = 9;
     parameter bus = 4;
-    output wire [largo-1:0] salida_contador;    //  Contador de los tiempos del RTC
+    //output wire [largo-1:0] salida_contador;    //  Contador de los tiempos del RTC
     
     //  Declaración de estados
     parameter [bus-1:0] a = 4'b0000,
@@ -238,5 +238,5 @@ module escritura_lectura(
     assign WR_reg = WR;
     assign RD_reg = RD;
     assign Data_reg = Data;
-    assign salida_contador = contador;
+    //assign salida_contador = contador;
 endmodule
