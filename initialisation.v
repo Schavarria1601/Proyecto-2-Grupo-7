@@ -22,10 +22,8 @@ module initialisation(
     clk, reset,
     inicio,
     end_flag,
-    initialisation_bit, //  Bit de inicialización
     direccion,
-    seconds, minutes, hours, date, month, year,
-    clk_and_timer_transfer
+    dato_initialisation
     );
     
     parameter bus_bit = 8;
@@ -34,10 +32,11 @@ module initialisation(
     input wire clk, reset;
     input wire inicio;
     output reg end_flag;
-    output reg [bus_bit-1:0] initialisation_bit;
-    output [largo-1:0] direccion;
+    //output reg [bus_bit-1:0] initialisation_bit;
+    output [bus_bit-1:0] direccion;
+    output wire [bus_bit-1:0] dato_initialisation;
     
-    output reg [bus_bit-1:0] seconds, minutes, hours, date, month, year, clk_and_timer_transfer;
+    //output reg [bus_bit-1:0] seconds, minutes, hours, date, month, year, clk_and_timer_transfer;
     
     parameter [bus-1:0]   a = 4'b0000,
                           b = 4'b0001,
@@ -48,7 +47,14 @@ module initialisation(
                           g = 4'b0110,
                           h = 4'b0111,
                           i = 4'b1000;
-    reg [bus-1:0] state_reg, state_next;     
+                          
+    parameter [bus_bit-1:0] initialisation_bit = 8'd0,
+                            seconds = 8'b01001001, minutes = 8'b00110000, hours = 8'b00100011, 
+                            date = 8'b00010000, month = 8'b00010010, year = 8'b10010100, clk_and_timer_transfer = 8'b11111111;               
+                          
+    reg [bus-1:0] state_reg, state_next;  
+    
+    reg [bus_bit-1:0] initialisation_data;
     
     wire [largo-1:0] address;                     
     
@@ -71,15 +77,9 @@ module initialisation(
             state_next = state_reg;
             
             //  Inicialización de las señales
-            end_flag = 1'b0;
-            initialisation_bit = 8'b0;
-            seconds = 8'b0; minutes = 8'b0; hours = 8'b0; date = 8'b0; 
-            month = 8'b0; year = 8'b0; clk_and_timer_transfer = 8'b0;
-            
+            end_flag = 1'b0;            
             case (state_reg)
                 a : begin
-                    seconds = 8'b0; minutes = 8'b0; hours = 8'b0; date = 8'b0; 
-                    month = 8'b0; year = 8'b0; clk_and_timer_transfer = 8'b0;
                     if (inicio)
                         state_next = b;
                     else
@@ -87,87 +87,71 @@ module initialisation(
                     end
                         
                 b : begin
-                    initialisation_bit = 8'b0; seconds = 8'b0; minutes = 8'b0; hours = 8'b0; date = 8'b0; 
-                    month = 8'b0; year = 8'b0; clk_and_timer_transfer = 8'b0;
                     if (address == 8'h02) begin
                         state_next = c;
-                        initialisation_bit = 8'b00010000; end   //  El bit #5 de inicialización se fija en 1
+                        initialisation_data = initialisation_bit; end   //  El bit #5 de inicialización se fija en 1
                     else
                         state_next = b;
                     end
                 
                 c : begin
                     //  Aquí el bit #5 de inicialización vuelve a 0 para cumplir lo que dice el datasheet
-                    initialisation_bit = 8'b0; seconds = 8'b0; minutes = 8'b0; hours = 8'b0; date = 8'b0; 
-                    month = 8'b0; year = 8'b0; clk_and_timer_transfer = 8'b0;
                     if (address == 8'h21) begin
                         state_next = d;
-                        seconds = 8'b01001001; end  //  Los segundos iniciarán en 49
+                        initialisation_data = seconds; end  //  Los segundos iniciarán en 49
                     else
                         state_next = c;
                     end
                     
                 d : begin
-                    initialisation_bit = 8'b0; seconds = 8'b01001001; minutes = 8'b0; hours = 8'b0; date = 8'b0; 
-                    month = 8'b0; year = 8'b0; clk_and_timer_transfer = 8'b0; 
                     if (address == 8'h22) begin
                         state_next = e;
-                        minutes = 8'b00110000; end  //  Los minutos iniciarán en 30
+                        initialisation_data = minutes; end  //  Los minutos iniciarán en 30
                     else
                         state_next = d;
                     end
                 e : begin
-                    initialisation_bit = 8'b0; seconds = 8'b01001001; minutes = 8'b00110000; hours = 8'b0; date = 8'b0; 
-                    month = 8'b0; year = 8'b0; clk_and_timer_transfer = 8'b0; 
-                    seconds = 8'b01001001; minutes = 8'b00110000;
                     if (address == 8'h23) begin
                         state_next = f;
-                        hours = 8'b00100011; end    //  Las horas iniciarán en 23
+                        initialisation_data = hours; end    //  Las horas iniciarán en 23
                     else
                         state_next = e;
                     end
                     
                 f : begin
-                    initialisation_bit = 8'b0; seconds = 8'b01001001; minutes = 8'b00110000; hours = 8'b00100011; 
-                    date = 8'b0; month = 8'b0; year = 8'b0; clk_and_timer_transfer = 8'b0;
                     if (address == 8'h24) begin
                         state_next = g;
-                        date = 8'b00010000; end     //  El día será 10 
+                        initialisation_data = date; end     //  El día será 10 
                     else
                         state_next = f;
                     end
                         
                 g : begin
-                    initialisation_bit = 8'b0; seconds = 8'b01001001; minutes = 8'b00110000; hours = 8'b00100011; 
-                    date = 8'b00010000; month = 8'b0; year = 8'b0; clk_and_timer_transfer = 8'b0;
                     if (address == 8'h25) begin
                         state_next = h;
-                        month = 8'b00010010; end    //  El mes será 12 (diciembre)
+                        initialisation_data = month; end    //  El mes será 12 (diciembre)
                     else
                         state_next = g;
                     end
                     
                 h : begin
-                    initialisation_bit = 8'b0; seconds = 8'b01001001; minutes = 8'b00110000; hours = 8'b00100011; 
-                    date = 8'b00010000; month = 8'b00010010; year = 8'b0; clk_and_timer_transfer = 8'b0;
                     if (address == 8'h26) begin
                         state_next = i;
-                        year = 8'b10010100; end //  El año será 94 (1994)
+                        initialisation_data = year; end //  El año será 94 (1994)
                     else
                         state_next = h;
                     end
                     
                 i : begin
-                    initialisation_bit = 8'b0; seconds = 8'b01001001; minutes = 8'b00110000; hours = 8'b00100011; 
-                    date = 8'b00010000; month = 8'b00010010; year = 8'b10010100; clk_and_timer_transfer = 8'b0;
                     if (address == 8'hF0) begin
                         state_next = a;
                         end_flag = 1'b1; 
-                        clk_and_timer_transfer = 8'b11111111; end   //  Se escribe en la dirección F0 (HEX), la transferencia a la memoria reservada.
+                        initialisation_data = clk_and_timer_transfer; end   //  Se escribe en la dirección F0 (HEX), la transferencia a la memoria reservada.
                     else
                         state_next = i;
                     end
             endcase
         end  
         assign direccion = address;
+        assign dato_initialisation = initialisation_data;
 endmodule
